@@ -11,7 +11,6 @@ router = APIRouter()
 # Rota para criar uma conta nova
 @router.post("/cadastro")
 def cadastrar(nome: str, email: str, senha: str, db: Session = Depends(get_db)):
-    # Importante: nunca salvar a senha pura! Esse comando transforma a senha em um código (hash)
     hash_da_senha = security.gerar_senha_hash(senha)
     
     # Preenche a ficha do novo usuário com os dados recebidos
