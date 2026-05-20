@@ -8,36 +8,32 @@ from fastapi.security import OAuth2PasswordRequestForm
 
 router = APIRouter()
 
-# Rota para criar uma conta nova
+# Rota de cadastro
 @router.post("/cadastro")
 def cadastrar(nome: str, email: str, senha: str, db: Session = Depends(get_db)):
     hash_da_senha = security.gerar_senha_hash(senha)
     
-    # Preenche a ficha do novo usuário com os dados recebidos
+    # Cria usuário 
     novo_usuario = models.Usuario(nome=nome, email=email, senha_hash=hash_da_senha, perfil="CLIENTE")
     
-    # Comandos do banco: adiciona na fila e depois confirma (commit) para salvar de verdade
+    # Salva no banco
     db.add(novo_usuario)
     db.commit()
     
-    return {"mensagem": "Usuário criado com sucesso (LGPD: Dados criptografados)"}
+    return {"mensagem": "Usuário criado com sucesso"}
 
-# Rota para entrar no sistema (Login)
+# Rota de login
 @router.post("/login")
-# Esse 'OAuth2PasswordRequestForm' faz aparecer aqueles campos de login  no Swagger (documentação)
 def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     
-    # Chama o serviço de autenticação para ver se o e-mail e a senha batem
-    # Obs: O FastAPI chama o e-mail de 'username' por padrão nesse formulário
+    #autentica usuário
     usuario = AuthService.autenticar_usuario(db, form_data.username, form_data.password)
     
-    # Se o serviço não encontrar o usuário ou a senha estiver errada, trava aqui
+    #Verifica login
     if not usuario:
         raise HTTPException(status_code=401, detail="E-mail ou senha incorretos")
     
-    # Se deu tudo certo, cria o crachá digital (token) para o usuário usar nas outras rotas
+    # Gera toke jwt
     token = security.criar_token_acesso({"sub": usuario.email, "perfil": usuario.perfil})
-    
-    # Devolve o token pro navegador/celular guardar
     return {"access_token": token, "token_type": "bearer"}
 

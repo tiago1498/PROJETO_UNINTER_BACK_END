@@ -4,7 +4,7 @@ import enum
 
 Base = declarative_base()
 
-# criei esse enum aqui pra limitar as opcoes do canal de venda
+# criado para limitar as opcoes do canal de venda
 # para evitar que as pessoas mandassem qualquer coisa no postman
 class CanalPedido(enum.Enum):
     APP = "APP"
