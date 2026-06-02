@@ -5,22 +5,40 @@ from app.infrastructure import security
 from app.application.auth_service import AuthService
 from app.domain import models
 from fastapi.security import OAuth2PasswordRequestForm
+from app.api import schemas
 
 router = APIRouter()
 
 # Rota de cadastro
 @router.post("/cadastro")
-def cadastrar(nome: str, email: str, senha: str, db: Session = Depends(get_db)):
-    hash_da_senha = security.gerar_senha_hash(senha)
-    
-    # Cria usuário 
-    novo_usuario = models.Usuario(nome=nome, email=email, senha_hash=hash_da_senha, perfil="CLIENTE")
-    
-    # Salva no banco
+def cadastrar(dados: schemas.UsuarioCreate, db: Session = Depends(get_db)):
+    usuario_existente = db.query(models.Usuario).filter(models.Usuario.email == dados.email).first()
+
+    if usuario_existente:
+        raise HTTPException(status_code=409, detail="E-mail já cadastrado")
+
+    hash_da_senha = security.gerar_senha_hash(dados.senha)
+
+    novo_usuario = models.Usuario(
+        nome=dados.nome,
+        email=dados.email,
+        senha_hash=hash_da_senha,
+        perfil=dados.perfil
+    )
+
     db.add(novo_usuario)
     db.commit()
-    
-    return {"mensagem": "Usuário criado com sucesso"}
+    db.refresh(novo_usuario)
+
+    return {
+        "mensagem": "Usuário criado com sucesso",
+        "usuario": {
+            "id": novo_usuario.id,
+            "nome": novo_usuario.nome,
+            "email": novo_usuario.email,
+            "perfil": novo_usuario.perfil
+        }
+    }
 
 # Rota de login
 @router.post("/login")

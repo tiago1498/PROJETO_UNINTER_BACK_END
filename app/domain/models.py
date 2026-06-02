@@ -9,16 +9,18 @@ Base = declarative_base()
 class CanalPedido(enum.Enum):
     APP = "APP"
     TOTEM = "TOTEM"
-    WHATSAPP = "WHATSAPP"
-    PRESENCIAL = "PRESENCIAL"
+    BALCAO = "BALCAO"
+    PICKUP = "PICKUP"
+    WEB = "WEB"
 
 class Usuario(Base):
     __tablename__ = "usuarios"
+
     id = Column(Integer, primary_key=True, index=True)
     nome = Column(String)
     email = Column(String, unique=True, index=True)
-    senha_hash = Column(String) # aqui vai a senha criptografada por causa da lgpd
-    perfil = Column(String) # pra saber se e admin ou cliente comum
+    senha_hash = Column(String)
+    perfil = Column(String, default="CLIENTE")
 
 class Pedido(Base):
     __tablename__ = "pedidos"
