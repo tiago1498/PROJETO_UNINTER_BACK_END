@@ -24,7 +24,23 @@ Esse projeto é uma API desenvolvida em Python com FastAPI para gerenciar os ped
    uvicorn main:app --reload
    ```
 
-O banco de dados SQLite vai ser gerado automaticamente assim que o servidor ligar. Para testar os endpoints e fazer os fluxos, acesse: `http://127.0.0`.
+O banco de dados SQLite vai ser gerado automaticamente assim que o servidor ligar. Para testar os endpoints e fazer os fluxos, acesse:
+
+http://127.0.0.1:8000/docs
+
+## Coleção Postman
+
+A coleção de testes está disponível em:
+
+docs/postman_collection.json
+
+Ordem sugerida para testar:
+1. T01 - Cadastrar cliente
+2. T03 - Login válido
+3. T05 - Criar pedido com token
+4. T07 - Listar pedidos com token
+5. T08 - Filtrar pedidos por canal APP
+6. T09 - Pagamento mock aprovado
 
 Esse projeto foi desenvolvido para aprender FastAPI, autenticação JWT e integração com banco de dados.
 
